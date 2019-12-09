@@ -2,8 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+struct node{
+	int val;
+	struct node* next;
+};
+
 struct gate{
-	int index;
+	int index; //tells you what type of gate it is
+	int* inputs; 
+	int amnt;
 	struct gate* next;
 };
 int getCommand(char* identifier);
@@ -88,21 +95,49 @@ int main(int argc, char** argv){
 	    		head->index = index;
 	    		current = head;
 	    	} else{
+	    		current = current->next;
 	    		current = malloc(sizeof(struct gate));
 	    		current->index = index;
 	    	}
 	    	
+	    	if(index == 1){
+	    		current->inputs = malloc(2*sizeof(int));
+	    	}else if(index > 1 && index < 8){
+	    		current->inputs = malloc(3*sizeof(int));
+	    	} else {
+	    		int numOfGateInputs = fscanf(fp, "%d\n", &numOfGateInputs);
+	    		current->inputs = malloc(numOfGateInputs*sizeof(int));
+	    	}
+	    	current->amnt = 0;
+
+
 	    	printf("%s: %d\n", identifier, current->index);
 	    	current->next = NULL;
-	    	current = current->next;
 	    } 
-	    if(strcmp(identifier, "INPUTVAR") == 0){
+	    else if(strcmp(identifier, "INPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfInputs);
 	    }
-	    if(strcmp(identifier, "OUTPUTVAR") == 0){
+	    else if(strcmp(identifier, "OUTPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfOutputs);
 
-	    }
+	    }else{
+		    char* s = identifier;
+		    int i = 0;
+		    while(i < s[i]){
+		    	i++;
+		    }
+		    i--;
+		    int num = s[i]-'0';
+		    printf("Identifier: %s, %d\n", identifier, num);
+
+
+		    if(head != NULL){
+		    	current->inputs[current->amnt] = num;
+		   		current->amnt++;
+		   		printf("current->amnt: %d\n", current->amnt);
+		    }
+
+		}
 
     }
 
