@@ -16,10 +16,13 @@ struct gate{
 int getCommand(char* identifier);
 int* getBinaryArray(int num, int numberOfInputs);
 int runArithmetic(int* inputs, struct gate* head);
+void printList(struct gate* head);
 
-int runArithmetic(int* inputs, struct gate* head){
+int runArithmetic(int* inputVar, struct gate* head){
 
-	return 0;
+	int answer = 0;
+
+	return answer;
 }
 
 //CONSRTRUCTING BINARY REPRESENTATION OF A NUMBER
@@ -90,14 +93,16 @@ int main(int argc, char** argv){
     	int index = getCommand(identifier);
 
     	if(index != 0){
+    		struct gate* temp = malloc(sizeof(struct gate));
+    		temp->index = index;
+    		temp->next = NULL;
+
 	    	if(head == NULL){
-	    		head = malloc(sizeof(struct gate));
-	    		head->index = index;
+	    		head = temp;
 	    		current = head;
 	    	} else{
+	    		current->next = temp;
 	    		current = current->next;
-	    		current = malloc(sizeof(struct gate));
-	    		current->index = index;
 	    	}
 	    	
 	    	if(index == 1){
@@ -111,8 +116,8 @@ int main(int argc, char** argv){
 	    	current->amnt = 0;
 
 
-	    	printf("%s: %d\n", identifier, current->index);
-	    	current->next = NULL;
+	    	//printf("%s: %d\n", identifier, current->index);
+
 	    } 
 	    else if(strcmp(identifier, "INPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfInputs);
@@ -123,23 +128,30 @@ int main(int argc, char** argv){
 	    }else{
 		    char* s = identifier;
 		    int i = 0;
+		    int y = 1;
+		    if(s[0] >= 'a' && s[0] <= 'z'){
+		    	y = -1;
+		    }
+
 		    while(i < s[i]){
 		    	i++;
 		    }
 		    i--;
-		    int num = s[i]-'0';
-		    printf("Identifier: %s, %d\n", identifier, num);
+		    int num = y*(s[i]-'0');
+		    //printf("Identifier: %s, %d\n", identifier, num);
 
 
 		    if(head != NULL){
 		    	current->inputs[current->amnt] = num;
 		   		current->amnt++;
-		   		printf("current->amnt: %d\n", current->amnt);
+		   		//printf("current->amnt: %d\n", current->amnt);
 		    }
 
 		}
 
     }
+
+    printList(head);
 
     printf("numberOfInputs: %d\n", numberOfInputs);
     printf("numberOfOutputs: %d\n", numberOfOutputs);
@@ -163,4 +175,18 @@ int main(int argc, char** argv){
 
     return 0;
 
+}
+
+void printList(struct gate* head){
+	struct gate* ptr = head;
+
+    while(ptr != NULL){
+    	printf("Gate: %d\n", ptr->index);
+    	for(int i = 0; i<ptr->amnt; i++){
+    		printf("%d ", ptr->inputs[i]);
+    	}
+    	printf("\n");
+
+    	ptr = ptr->next;
+    }
 }
