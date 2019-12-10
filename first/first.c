@@ -83,22 +83,22 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 			temp->next = NULL;
 			if(strcmp(runner->name, "AND") == 0){
 				temp->val = val1 & val2;
-				printf("%d ", temp->val);
+				//printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "OR") == 0){
 				temp->val = val1 | val2;
-				printf("%d ", temp->val);
+				//printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "NAND") == 0){
-				temp->val = ~(val1 & val2);
-				printf("%d ", temp->val);
+				temp->val = !(val1 & val2);
+				//printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "NOR") == 0){
-				temp->val = ~(val1 | val2);
-				printf("%d ", temp->val);
+				temp->val = !(val1 | val2);
+				//printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "XOR") == 0){
 				temp->val = (val1 ^ val2);
-				printf("%d ", temp->val);
+				//printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "XNOR") == 0){
-				temp->val = ~(val1 ^ val2);
-				printf("%d ", temp->val);
+				temp->val = !(val1 ^ val2);
+				//printf("%d ", temp->val);
 			} 
 
 			outputHead = insert(temp, outputHead); 
@@ -107,13 +107,13 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 		runner = runner->next;
 	}
 
-	printNodeList(outputHead);
+	//printNodeList(outputHead);
 
 	for(int i = 0; i<numberOfOutputs; i++){
 		answer[i] = search(outputNames[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
 	}
 
-	printf("\n");
+	//printf("\n");
 
 	return answer;
 }
@@ -274,12 +274,13 @@ int main(int argc, char** argv){
     	g = i ^ (i >> 1);
 	    int* array = getBinaryArray( g, numberOfInputs );
 	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
-//SOULUTION
-	    // for(int i = 0;  i<numberOfInputs; i++){
-	    // 	printf("%d ", array[i]);
-	    // }
+//SOULUTION IMPORTANT
+	    for(int i = 0;  i<numberOfInputs; i++){
+	    	printf("%d ", array[i]);
+	    }
+//PRINTS OUTPUT IMPORTANT
 	    for(int i = 0; i<numberOfOutputs; i++){
-	     	printf("OUTPUT: %d\n ", x[i]);
+	     	printf("%d\n", x[i]);
 	    }
 
     	// printf("G: %d\n", g);
