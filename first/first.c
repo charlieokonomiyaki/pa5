@@ -17,7 +17,7 @@ struct gate{
 };
 int getCommand(char* identifier);
 int* getBinaryArray(int num, int numberOfInputs);
-int runArithmetic(int* inputs, struct gate* head, int numberOfInputs, char** orderOfInputs);
+int* runArithmetic(int* inputs, struct gate* head, int numberOfInputs, char** orderOfInputs, char** outputNames, int numberOfOutputs);
 void printList(struct gate* head);
 void printStringArray(char** arr, int size);
 struct node* insert(struct node* temp, struct node* head);
@@ -59,30 +59,28 @@ int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHe
 
 }
 
-int runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** orderOfInputs){
+int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** orderOfInputs, char** outputNames, int numberOfOutputs){
 
-	int answer = 0;
+	int* answer = malloc(numberOfOutputs*sizeof(int));
 	struct gate* runner = head;
 	struct node* outputHead = NULL;
 
 	while(runner != NULL){
 		//printf("%s--->", runner->name);
-
-		if(runner->index == 0){ //this means its not
+		if(runner->index == 0){
+			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			struct node* temp = malloc(sizeof(struct node));
 			temp->name = runner->inputs[1];
 			temp->next = NULL;
-			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			temp->val = val1;
 		}
 
 		if(runner->index > 1 && runner->index<8){
+			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			int val2 = search(runner->inputs[1], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			struct node* temp = malloc(sizeof(struct node));
 			temp->name = runner->inputs[2];
 			temp->next = NULL;
-
-			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
-			int val2 = search(runner->inputs[1], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			if(strcmp(runner->name, "AND") == 0){
 				temp->val = val1 & val2;
 				printf("%d ", temp->val);
@@ -96,23 +94,24 @@ int runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** o
 				temp->val = ~(val1 | val2);
 				printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "XOR") == 0){
-				temp->val = val1 ^ val2;
+				temp->val = (val1 ^ val2);
 				printf("%d ", temp->val);
 			} else if(strcmp(runner->name, "XNOR") == 0){
 				temp->val = ~(val1 ^ val2);
 				printf("%d ", temp->val);
-			}
+			} 
 
 			outputHead = insert(temp, outputHead); 
 
 		}
-
-		outputHead = insert(temp, outputHead); 
-
 		runner = runner->next;
 	}
 
 	printNodeList(outputHead);
+
+	for(int i = 0; i<numberOfOutputs; i++){
+		answer[i] = search(outputNames[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
+	}
 
 	printf("\n");
 
@@ -181,6 +180,7 @@ int main(int argc, char** argv){
     int numberOfInputs = 0;
   	char** orderOfInputs;
     int numberOfOutputs = 0;
+    char** outputNames;
 
     char identifier[64]; 
     while(fscanf(fp, "%s", identifier)>0){
@@ -237,6 +237,12 @@ int main(int argc, char** argv){
 	    }
 	    else if(strcmp(identifier, "OUTPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfOutputs);
+	    	outputNames = malloc(numberOfOutputs*sizeof(char*));
+	    	for(int i = 0; i<numberOfOutputs; i++){
+	    		outputNames[i] = malloc(64*sizeof(char));
+	    		fscanf(fp, "%s", identifier);
+	    		strcpy(outputNames[i], identifier);
+	    	}
 
 	    }else{
 
@@ -259,6 +265,7 @@ int main(int argc, char** argv){
     printStringArray(orderOfInputs, numberOfInputs);
 
     printf("numberOfOutputs: %d\n", numberOfOutputs);
+    printStringArray(outputNames, numberOfOutputs);
 
 //generating grey code 
     int g;
@@ -266,13 +273,14 @@ int main(int argc, char** argv){
     for(int i = 0; i<n; i++){
     	g = i ^ (i >> 1);
 	    int* array = getBinaryArray( g, numberOfInputs );
-	    int x = runArithmetic(array, head, numberOfInputs, orderOfInputs);
+	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
 //SOULUTION
 	    // for(int i = 0;  i<numberOfInputs; i++){
 	    // 	printf("%d ", array[i]);
 	    // }
-
-	     printf("OUTPUT: %d\n ", x);
+	    for(int i = 0; i<numberOfOutputs; i++){
+	     	printf("OUTPUT: %d\n ", x[i]);
+	    }
 
     	// printf("G: %d\n", g);
     }
