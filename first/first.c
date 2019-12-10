@@ -121,10 +121,10 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 			temp->name = runner->inputs[runner->amnt-1];
 			temp->next = NULL;
 
-			printf("hello\n");
-			printf("gateInputs:%d amnt: %d\n", runner->gateInputs, runner->amnt);
+			//printf("hello\n");
+			//printf("gateInputs:%d amnt: %d\n", runner->gateInputs, runner->amnt);
 
-			printf("---------------GRAY CODE ARRAY--------------------\n");
+			//printf("---------------GRAY CODE ARRAY--------------------\n");
 
 			int* values = malloc((runner->amnt-1)*sizeof(int));
 			int* tempValues = malloc((runner->amnt-1)*sizeof(int));
@@ -134,8 +134,8 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 				values[i] = search(runner->inputs[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			}
 
-			printf("Initial: \n");
-			printIntArray(values, runner->amnt-1);
+			//printf("Initial: \n");
+			//printIntArray(values, runner->amnt-1);
 			int* total = malloc(runner->gateInputs*sizeof(int));
 
 			int g;
@@ -154,28 +154,28 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 				g = i ^ (i>>1);
 				int* array = getBinaryArray(g, logOfgateInputs);
 
-				printf("G: %d\n", g);
-				printIntArray(array, logOfgateInputs);
+				//printf("G: %d\n", g);
+				//printIntArray(array, logOfgateInputs);
 				
 				for(int j = 0; j<logOfgateInputs; j++){
 					if(array[j] == 0){
 						tempValues[runner->gateInputs+j] = !(tempValues[runner->gateInputs+j]);
 					} 
 				}
-				printf("RESULT\n");
-	    		printIntArray(tempValues, runner->amnt-1);
+				//printf("RESULT\n");
+	    		//printIntArray(tempValues, runner->amnt-1);
 
 	    		total[i] = tempValues[i];
 
-	    		printf("This is the or:\n");
-	    		printf("%d ", total[i]);
+	    		//printf("This is the or:\n");
+	    		//printf("%d ", total[i]);
 
 	    		for(int j = 0; j<logOfgateInputs; j++){
 	    			total[i] = total[i] & tempValues[runner->gateInputs+j];
-	    			printf("%d ", tempValues[runner->gateInputs+j]);
+	    			//printf("%d ", tempValues[runner->gateInputs+j]);
 	    		}
 
-	    		printf("\n");
+	    		//printf("\n");
 			}
 
 			int multiOutput = 0;
@@ -185,14 +185,60 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 			}
 
 			temp->val = multiOutput;
-			printf("multiOutput: %d\n", multiOutput);
+			//printf("multiOutput: %d\n", multiOutput);
 
-			printf("---------------END OF GRAY CODE ARRAY-------------\n");
+			//printf("---------------END OF GRAY CODE ARRAY-------------\n");
 
-			printf("Inserting %d into %s\n", temp->val, temp->name);
+			//printf("Inserting %d into %s\n", temp->val, temp->name);
 			outputHead = insert(temp, outputHead);
-		}
+		}//ENDOF MULTIPLEXER
 
+		if(runner->index == 8){
+			printf("hello\n");
+
+			int* values = malloc(runner->gateInputs*sizeof(int));
+			int* tempValues = malloc(runner->gateInputs*sizeof(int));
+
+			for(int i = 0; i<runner->gateInputs; i++){
+				values[i] = search(runner->inputs[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			}
+
+			printStringArray(runner->inputs, runner->gateInputs);
+			printIntArray(values, runner->gateInputs);
+
+			int g;
+			int n = 1<<runner->gateInputs;
+			for(int i = 0; i<n; i++){
+
+				for(int j = 0; j<(runner->gateInputs); j++){
+					tempValues[j] = values[j];
+				}
+
+				struct node* temp = malloc(sizeof(struct node));
+				temp->name = runner->inputs[runner->gateInputs+i]; //think about changing this to strcpy
+				temp->next = NULL;
+				g = i ^ (i>>1);
+
+				int* array = getBinaryArray(g, runner->gateInputs);
+				printf("G: %d\n", g);
+				printIntArray(array, runner->gateInputs);
+
+				for(int j=0; j<runner->gateInputs; j++){
+					if(array[j] == 0){
+						tempValues[j] = !(tempValues[j]);
+					} 
+				}
+
+				int decoderOutput = 1;
+				for(int j = 0; i<runner->gateInputs; i++){
+					decoderOutput = decoderOutput & tempValues[j];
+				}	
+
+				temp->val = decoderOutput;
+
+				outputHead = insert(temp, outputHead);
+			} //end of gray loop
+		}//ENDOF 
 
 		runner = runner->next;
 	}
@@ -203,11 +249,11 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 		answer[i] = search(outputNames[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
 	}
 
-	printNodeList(outputHead);
+	//printNodeList(outputHead);
 
-	printStringArray(outputNames, numberOfOutputs);
+	//printStringArray(outputNames, numberOfOutputs);
 
-	printIntArray(answer, numberOfOutputs);
+	//printIntArray(answer, numberOfOutputs);
 
 	//printf("\n");
 
@@ -305,13 +351,13 @@ int main(int argc, char** argv){
 	    		for(int i = 0; i<3; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
-	    	} else if (index == 9){
-	    		printf("helllo\n");
+	    	} else if (index == 9){ //mutliplexer
+	    		//printf("helllo\n");
 
 	    		int numOfGateInputs;
 	    		fscanf(fp, "%d\n", &numOfGateInputs);
 
-	    		printf("%d", numOfGateInputs);
+	    		//printf("%d", numOfGateInputs);
 
 	    		temp->gateInputs = numOfGateInputs;
 
@@ -321,6 +367,19 @@ int main(int argc, char** argv){
 	    		for(int i = 0; i<numOfMultiInputs; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
+
+	    	} else if(index == 8){
+	    		int numOfGateInputs;
+	    		fscanf(fp, "%d\n", &numOfGateInputs);
+
+	    		temp->gateInputs = numOfGateInputs;
+	    		int numOfDecoderInputs = (numOfGateInputs) + (1<<numOfGateInputs); //inputs + outputs
+
+	    		current->inputs = malloc(numOfDecoderInputs*sizeof(char*));
+	    		for(int i = 0; i<numOfDecoderInputs; i++){
+	    			current->inputs[i] = malloc(64*sizeof(char));
+	    		}
+
 
 	    	}
 	    	current->amnt = 0;
@@ -380,7 +439,7 @@ int main(int argc, char** argv){
     for(int i = 0; i<n; i++){
     	g = i ^ (i >> 1);
 	    int* array = getBinaryArray( g, numberOfInputs );
-printf("--------RUNNING ARITHMATIC-------------\n");
+//printf("--------RUNNING ARITHMATIC-------------\n");
 	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
 //SOULUTION IMPORTANT
 	    for(int i = 0;  i<numberOfInputs; i++){
