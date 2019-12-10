@@ -4,23 +4,117 @@
 
 struct node{
 	int val;
+	char* name;
 	struct node* next;
 };
 
 struct gate{
 	int index; //tells you what type of gate it is
-	int* inputs; 
+	char* name;
+	char** inputs; 
 	int amnt;
 	struct gate* next;
 };
 int getCommand(char* identifier);
 int* getBinaryArray(int num, int numberOfInputs);
-int runArithmetic(int* inputs, struct gate* head);
+int runArithmetic(int* inputs, struct gate* head, int numberOfInputs, char** orderOfInputs);
 void printList(struct gate* head);
+void printStringArray(char** arr, int size);
+struct node* insert(struct node* temp, struct node* head);
+int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHead, int numberOfInputs);
+void printNodeList(struct node* head);
 
-int runArithmetic(int* inputVar, struct gate* head){
+struct node* insert(struct node* temp, struct node* head){
+	struct node* ptr = head;
+
+	if(head == NULL){
+		return temp;
+	}else{
+		while(ptr->next != NULL){
+			ptr = ptr->next;
+		}
+	}
+	ptr->next = temp;
+	return head;
+}
+
+int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHead, int numberOfInputs){
+
+	for(int i = 0; i<numberOfInputs; i++){
+		if(strcmp(var, orderOfInputs[i]) == 0){
+			return inputVar[i];
+		}
+	}
+
+	struct node* ptr = outputHead;
+	while(ptr != NULL){
+		if(strcmp(var,ptr->name) == 0){
+			return ptr->val;
+		}
+		ptr = ptr->next;
+	}
+
+	return -1;
+
+
+}
+
+int runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** orderOfInputs){
 
 	int answer = 0;
+	struct gate* runner = head;
+	struct node* outputHead = NULL;
+
+	while(runner != NULL){
+		//printf("%s--->", runner->name);
+
+		if(runner->index == 0){ //this means its not
+			struct node* temp = malloc(sizeof(struct node));
+			temp->name = runner->inputs[1];
+			temp->next = NULL;
+			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			temp->val = val1;
+		}
+
+		if(runner->index > 1 && runner->index<8){
+			struct node* temp = malloc(sizeof(struct node));
+			temp->name = runner->inputs[2];
+			temp->next = NULL;
+
+			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			int val2 = search(runner->inputs[1], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			if(strcmp(runner->name, "AND") == 0){
+				temp->val = val1 & val2;
+				printf("%d ", temp->val);
+			} else if(strcmp(runner->name, "OR") == 0){
+				temp->val = val1 | val2;
+				printf("%d ", temp->val);
+			} else if(strcmp(runner->name, "NAND") == 0){
+				temp->val = ~(val1 & val2);
+				printf("%d ", temp->val);
+			} else if(strcmp(runner->name, "NOR") == 0){
+				temp->val = ~(val1 | val2);
+				printf("%d ", temp->val);
+			} else if(strcmp(runner->name, "XOR") == 0){
+				temp->val = val1 ^ val2;
+				printf("%d ", temp->val);
+			} else if(strcmp(runner->name, "XNOR") == 0){
+				temp->val = ~(val1 ^ val2);
+				printf("%d ", temp->val);
+			}
+
+			outputHead = insert(temp, outputHead); 
+
+		}
+
+		outputHead = insert(temp, outputHead); 
+
+		runner = runner->next;
+	}
+
+	printNodeList(outputHead);
+
+	printf("\n");
 
 	return answer;
 }
@@ -85,15 +179,18 @@ int main(int argc, char** argv){
     struct gate* current = NULL;
 
     int numberOfInputs = 0;
+  	char** orderOfInputs;
     int numberOfOutputs = 0;
 
     char identifier[64]; 
-    while(fscanf(fp, "%s\n", identifier)>0){
+    while(fscanf(fp, "%s", identifier)>0){
 
     	int index = getCommand(identifier);
 
     	if(index != 0){
     		struct gate* temp = malloc(sizeof(struct gate));
+    		temp->name = malloc(64*sizeof(char));
+    		strcpy(temp->name,identifier);
     		temp->index = index;
     		temp->next = NULL;
 
@@ -106,12 +203,21 @@ int main(int argc, char** argv){
 	    	}
 	    	
 	    	if(index == 1){
-	    		current->inputs = malloc(2*sizeof(int));
+	    		current->inputs = malloc(2*sizeof(char*));
+	    		for(int i = 0; i<2; i++){
+	    			current->inputs[i] = malloc(sizeof(char));
+	    		}
 	    	}else if(index > 1 && index < 8){
-	    		current->inputs = malloc(3*sizeof(int));
+	    		current->inputs = malloc(3*sizeof(char*));
+	    		for(int i = 0; i<3; i++){
+	    			current->inputs[i] = malloc(64*sizeof(char));
+	    		}
 	    	} else {
 	    		int numOfGateInputs = fscanf(fp, "%d\n", &numOfGateInputs);
-	    		current->inputs = malloc(numOfGateInputs*sizeof(int));
+	    		current->inputs = malloc(numOfGateInputs*sizeof(char*));
+	    		for(int i = 0; i<numOfGateInputs; i++){
+	    			current->inputs[i] = malloc(64*sizeof(char));
+	    		}
 	    	}
 	    	current->amnt = 0;
 
@@ -121,39 +227,37 @@ int main(int argc, char** argv){
 	    } 
 	    else if(strcmp(identifier, "INPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfInputs);
+	    	orderOfInputs = malloc(numberOfInputs*sizeof(char*));
+	    	for(int i = 0; i<numberOfInputs; i++){
+	    		orderOfInputs[i] = malloc(64*sizeof(char));
+	    		fscanf(fp, "%s", identifier);
+	    		strcpy(orderOfInputs[i], identifier);
+	    	}
+
 	    }
 	    else if(strcmp(identifier, "OUTPUTVAR") == 0){
 	    	fscanf(fp, "%d", &numberOfOutputs);
 
 	    }else{
-		    char* s = identifier;
-		    int i = 0;
-		    int y = 1;
-		    if(s[0] >= 'a' && s[0] <= 'z'){
-		    	y = -1;
-		    }
 
-		    while(i < s[i]){
-		    	i++;
-		    }
-		    i--;
-		    int num = y*(s[i]-'0');
-		    //printf("Identifier: %s, %d\n", identifier, num);
-
-
+		    printf("Identifier: %s\n", identifier);
 		    if(head != NULL){
-		    	current->inputs[current->amnt] = num;
+		    	printf("current index: %d\n", current->index);
+
+		    	//current->inputs[current->amnt] = "hello cat";
+
+		    	strcpy(current->inputs[current->amnt], identifier);
+
 		   		current->amnt++;
-		   		//printf("current->amnt: %d\n", current->amnt);
 		    }
 
 		}
 
     }
 
-    printList(head);
-
     printf("numberOfInputs: %d\n", numberOfInputs);
+    printStringArray(orderOfInputs, numberOfInputs);
+
     printf("numberOfOutputs: %d\n", numberOfOutputs);
 
 //generating grey code 
@@ -162,16 +266,17 @@ int main(int argc, char** argv){
     for(int i = 0; i<n; i++){
     	g = i ^ (i >> 1);
 	    int* array = getBinaryArray( g, numberOfInputs );
-	    int x = runArithmetic(array, head);
+	    int x = runArithmetic(array, head, numberOfInputs, orderOfInputs);
+//SOULUTION
+	    // for(int i = 0;  i<numberOfInputs; i++){
+	    // 	printf("%d ", array[i]);
+	    // }
 
-	    for(int i = 0;  i<numberOfInputs; i++){
-	    	printf("%d ", array[i]);
-	    }
+	     printf("OUTPUT: %d\n ", x);
 
-	    printf("%d ", x);
-
-    	printf("G: %d\n", g);
+    	// printf("G: %d\n", g);
     }
+
 
     return 0;
 
@@ -181,12 +286,31 @@ void printList(struct gate* head){
 	struct gate* ptr = head;
 
     while(ptr != NULL){
-    	printf("Gate: %d\n", ptr->index);
+    	printf("Gate: %d, GateName: %s\n", ptr->index, ptr->name);
     	for(int i = 0; i<ptr->amnt; i++){
-    		printf("%d ", ptr->inputs[i]);
+    		printf("%s ", ptr->inputs[i]);
     	}
     	printf("\n");
 
     	ptr = ptr->next;
     }
+}
+
+void printNodeList(struct node* head){
+	struct node* ptr = head;
+
+    while(ptr != NULL){
+    	
+    	printf("name: %s, val: %d---->", ptr->name, ptr->val);
+
+    	ptr = ptr->next;
+    }
+    printf("\n");
+}
+
+void printStringArray(char** arr, int size){
+    for(int i = 0; i<size; i++){
+    	printf("%s ", arr[i]);
+    }
+    printf("\n");
 }
