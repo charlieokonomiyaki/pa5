@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 struct node{
 	int val;
@@ -11,7 +12,8 @@ struct node{
 struct gate{
 	int index; //tells you what type of gate it is
 	char* name;
-	char** inputs; 
+	char** inputs;
+	int gateInputs; //used mainly for multiplexer and decoder 
 	int amnt;
 	struct gate* next;
 };
@@ -23,6 +25,7 @@ void printStringArray(char** arr, int size);
 struct node* insert(struct node* temp, struct node* head);
 int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHead, int numberOfInputs);
 void printNodeList(struct node* head);
+void printIntArray(int* arr, int size);
 
 struct node* insert(struct node* temp, struct node* head){
 	struct node* ptr = head;
@@ -54,7 +57,9 @@ int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHe
 		ptr = ptr->next;
 	}
 
-	return -1;
+	int itself = atoi(var);
+
+	return itself; //this will return the number itself as a digit
 
 
 }
@@ -110,6 +115,85 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 			outputHead = insert(temp, outputHead); 
 
 		}
+		if(runner->index == 9){
+
+			struct node* temp = malloc(sizeof(struct node));
+			temp->name = runner->inputs[runner->amnt-1];
+			temp->next = NULL;
+
+			printf("hello\n");
+			printf("gateInputs:%d amnt: %d\n", runner->gateInputs, runner->amnt);
+
+			printf("---------------GRAY CODE ARRAY--------------------\n");
+
+			int* values = malloc((runner->amnt-1)*sizeof(int));
+			int* tempValues = malloc((runner->amnt-1)*sizeof(int));
+
+
+			for(int i = 0; i<(runner->amnt-1); i++){
+				values[i] = search(runner->inputs[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
+			}
+
+			printf("Initial: \n");
+			printIntArray(values, runner->amnt-1);
+			int* total = malloc(runner->gateInputs*sizeof(int));
+
+			int g;
+			int logOfgateInputs = log2(runner->gateInputs);
+			int n = 1<<logOfgateInputs;
+			for(int i = 0; i<n; i++){ //THE GRAYCODE LOOP
+
+				//copying values
+
+				for(int j = 0; j<(runner->amnt-1); j++){
+					tempValues[j] = values[j];
+				}
+
+				//end of copyingvalues
+
+				g = i ^ (i>>1);
+				int* array = getBinaryArray(g, logOfgateInputs);
+
+				printf("G: %d\n", g);
+				printIntArray(array, logOfgateInputs);
+				
+				for(int j = 0; j<logOfgateInputs; j++){
+					if(array[j] == 0){
+						tempValues[runner->gateInputs+j] = !(tempValues[runner->gateInputs+j]);
+					} 
+				}
+				printf("RESULT\n");
+	    		printIntArray(tempValues, runner->amnt-1);
+
+	    		total[i] = tempValues[i];
+
+	    		printf("This is the or:\n");
+	    		printf("%d ", total[i]);
+
+	    		for(int j = 0; j<logOfgateInputs; j++){
+	    			total[i] = total[i] & tempValues[runner->gateInputs+j];
+	    			printf("%d ", tempValues[runner->gateInputs+j]);
+	    		}
+
+	    		printf("\n");
+			}
+
+			int multiOutput = 0;
+
+			for(int i = 0; i<runner->gateInputs; i++){
+				multiOutput =  multiOutput|total[i];
+			}
+
+			temp->val = multiOutput;
+			printf("multiOutput: %d\n", multiOutput);
+
+			printf("---------------END OF GRAY CODE ARRAY-------------\n");
+
+			printf("Inserting %d into %s\n", temp->val, temp->name);
+			outputHead = insert(temp, outputHead);
+		}
+
+
 		runner = runner->next;
 	}
 
@@ -118,6 +202,12 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 	for(int i = 0; i<numberOfOutputs; i++){
 		answer[i] = search(outputNames[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
 	}
+
+	printNodeList(outputHead);
+
+	printStringArray(outputNames, numberOfOutputs);
+
+	printIntArray(answer, numberOfOutputs);
 
 	//printf("\n");
 
@@ -137,10 +227,7 @@ int* getBinaryArray(int num, int numberOfInputs){
 		} else{
 			arr[numberOfInputs-(i+1)] = 0;
 		}
-
-
 	}
-
 	return arr;
 }
 
@@ -218,17 +305,28 @@ int main(int argc, char** argv){
 	    		for(int i = 0; i<3; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
-	    	} else {
-	    		int numOfGateInputs = fscanf(fp, "%d\n", &numOfGateInputs);
-	    		current->inputs = malloc(numOfGateInputs*sizeof(char*));
-	    		for(int i = 0; i<numOfGateInputs; i++){
+	    	} else if (index == 9){
+	    		printf("helllo\n");
+
+	    		int numOfGateInputs;
+	    		fscanf(fp, "%d\n", &numOfGateInputs);
+
+	    		printf("%d", numOfGateInputs);
+
+	    		temp->gateInputs = numOfGateInputs;
+
+	    		int numOfMultiInputs = numOfGateInputs+log2(numOfGateInputs) + 1;
+
+	    		current->inputs = malloc(numOfMultiInputs*sizeof(char*));
+	    		for(int i = 0; i<numOfMultiInputs; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
+
 	    	}
 	    	current->amnt = 0;
 
 
-	    	//printf("%s: %d\n", identifier, current->index);
+	    	printf("%s: %d\n", identifier, current->index);
 
 	    } 
 	    else if(strcmp(identifier, "INPUTVAR") == 0){
@@ -252,11 +350,12 @@ int main(int argc, char** argv){
 
 	    }else{
 
-		    //printf("Identifier: %s\n", identifier);
+		    printf("Identifier: %s\n", identifier);
 		    if(head != NULL){
 		    //	printf("current index: %d\n", current->index);
 
 		    	//current->inputs[current->amnt] = "hello cat";
+
 
 		    	strcpy(current->inputs[current->amnt], identifier);
 
@@ -281,6 +380,7 @@ int main(int argc, char** argv){
     for(int i = 0; i<n; i++){
     	g = i ^ (i >> 1);
 	    int* array = getBinaryArray( g, numberOfInputs );
+printf("--------RUNNING ARITHMATIC-------------\n");
 	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
 //SOULUTION IMPORTANT
 	    for(int i = 0;  i<numberOfInputs; i++){
@@ -316,6 +416,10 @@ void printList(struct gate* head){
 void printNodeList(struct node* head){
 	struct node* ptr = head;
 
+	if(ptr == NULL){
+		printf("list is empty");
+	}
+
     while(ptr != NULL){
     	
     	printf("name: %s, val: %d---->", ptr->name, ptr->val);
@@ -330,4 +434,12 @@ void printStringArray(char** arr, int size){
     	printf("%s ", arr[i]);
     }
     printf("\n");
+}
+
+void printIntArray(int* arr, int size){
+	for(int i = 0;  i<size; i++){
+	    printf("%d ", arr[i]);
+	}
+
+	printf("\n");
 }
