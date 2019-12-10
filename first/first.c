@@ -67,12 +67,18 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 
 	while(runner != NULL){
 		//printf("%s--->", runner->name);
-		if(runner->index == 0){
+		if(runner->index == 1){
 			int val1 = search(runner->inputs[0], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			struct node* temp = malloc(sizeof(struct node));
 			temp->name = runner->inputs[1];
 			temp->next = NULL;
-			temp->val = val1;
+			//printf("val1: %d\n", val1);
+
+			temp->val = ~(val1);
+
+			//printf("temp->Val: %d", temp->val);
+
+			outputHead = insert(temp, outputHead);
 		}
 
 		if(runner->index > 1 && runner->index<8){
@@ -201,11 +207,11 @@ int main(int argc, char** argv){
 	    		current->next = temp;
 	    		current = current->next;
 	    	}
-	    	
+	   		
 	    	if(index == 1){
 	    		current->inputs = malloc(2*sizeof(char*));
 	    		for(int i = 0; i<2; i++){
-	    			current->inputs[i] = malloc(sizeof(char));
+	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
 	    	}else if(index > 1 && index < 8){
 	    		current->inputs = malloc(3*sizeof(char*));
@@ -261,6 +267,8 @@ int main(int argc, char** argv){
 
     }
 
+    //printf("hello\n");
+
     //printf("numberOfInputs: %d\n", numberOfInputs);
     //printStringArray(orderOfInputs, numberOfInputs);
 
@@ -280,9 +288,9 @@ int main(int argc, char** argv){
 	    }
 //PRINTS OUTPUT IMPORTANT
 	    for(int i = 0; i<numberOfOutputs; i++){
-	     	printf("%d\n", x[i]);
+	     	printf("%d ", x[i]);
 	    }
-
+	    printf("\n");
     	// printf("G: %d\n", g);
     }
 
