@@ -205,9 +205,11 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 
 			//printStringArray(runner->inputs, runner->gateInputs);
 			//printIntArray(values, runner->gateInputs);
+			//printStringArray(outputNames, numberOfOutputs);
 
 			int g;
-			int n = 1<<runner->gateInputs;
+			int n = 1<<(runner->gateInputs);
+
 			for(int i = 0; i<n; i++){
 
 				for(int j = 0; j<(runner->gateInputs); j++){
@@ -216,6 +218,8 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 
 				struct node* temp = malloc(sizeof(struct node));
 				temp->name = runner->inputs[runner->gateInputs+i]; //think about changing this to strcpy
+				//printf("OUTPUT INDEX: %d", runner->gateInputs+i);
+				//printf("Name: %s\n", runner->inputs[runner->gateInputs+i]);
 				temp->next = NULL;
 				g = i ^ (i>>1);
 
@@ -230,7 +234,7 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 				}
 
 				int decoderOutput = 1;
-				for(int j = 0; i<runner->gateInputs; i++){
+				for(int j = 0; j<runner->gateInputs; j++){
 					decoderOutput = decoderOutput & tempValues[j];
 				}	
 
@@ -238,7 +242,7 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 
 				outputHead = insert(temp, outputHead);
 			} //end of gray loop
-		}//ENDOF 
+		}//ENDOF DECODER
 
 		runner = runner->next;
 	}
