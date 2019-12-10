@@ -246,9 +246,9 @@ int main(int argc, char** argv){
 
 	    }else{
 
-		    printf("Identifier: %s\n", identifier);
+		    //printf("Identifier: %s\n", identifier);
 		    if(head != NULL){
-		    	printf("current index: %d\n", current->index);
+		    //	printf("current index: %d\n", current->index);
 
 		    	//current->inputs[current->amnt] = "hello cat";
 
@@ -261,11 +261,11 @@ int main(int argc, char** argv){
 
     }
 
-    printf("numberOfInputs: %d\n", numberOfInputs);
-    printStringArray(orderOfInputs, numberOfInputs);
+    //printf("numberOfInputs: %d\n", numberOfInputs);
+    //printStringArray(orderOfInputs, numberOfInputs);
 
-    printf("numberOfOutputs: %d\n", numberOfOutputs);
-    printStringArray(outputNames, numberOfOutputs);
+    //printf("numberOfOutputs: %d\n", numberOfOutputs);
+    //printStringArray(outputNames, numberOfOutputs);
 
 //generating grey code 
     int g;
