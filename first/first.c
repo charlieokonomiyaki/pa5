@@ -194,7 +194,7 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 		}//ENDOF MULTIPLEXER
 
 		if(runner->index == 8){
-			printf("hello\n");
+			//printf("hello\n");
 
 			int* values = malloc(runner->gateInputs*sizeof(int));
 			int* tempValues = malloc(runner->gateInputs*sizeof(int));
@@ -203,8 +203,8 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 				values[i] = search(runner->inputs[i], orderOfInputs, inputVar, outputHead, numberOfInputs);
 			}
 
-			printStringArray(runner->inputs, runner->gateInputs);
-			printIntArray(values, runner->gateInputs);
+			//printStringArray(runner->inputs, runner->gateInputs);
+			//printIntArray(values, runner->gateInputs);
 
 			int g;
 			int n = 1<<runner->gateInputs;
@@ -220,8 +220,8 @@ int* runArithmetic(int* inputVar, struct gate* head, int numberOfInputs, char** 
 				g = i ^ (i>>1);
 
 				int* array = getBinaryArray(g, runner->gateInputs);
-				printf("G: %d\n", g);
-				printIntArray(array, runner->gateInputs);
+				//printf("G: %d\n", g);
+				//printIntArray(array, runner->gateInputs);
 
 				for(int j=0; j<runner->gateInputs; j++){
 					if(array[j] == 0){
@@ -385,7 +385,7 @@ int main(int argc, char** argv){
 	    	current->amnt = 0;
 
 
-	    	printf("%s: %d\n", identifier, current->index);
+	    	//printf("%s: %d\n", identifier, current->index);
 
 	    } 
 	    else if(strcmp(identifier, "INPUTVAR") == 0){
@@ -409,7 +409,7 @@ int main(int argc, char** argv){
 
 	    }else{
 
-		    printf("Identifier: %s\n", identifier);
+		    //printf("Identifier: %s\n", identifier);
 		    if(head != NULL){
 		    //	printf("current index: %d\n", current->index);
 
