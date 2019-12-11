@@ -56,10 +56,10 @@ int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHe
 		}
 		ptr = ptr->next;
 	}
-		int itself = atoi(var);
+
+	int itself = atoi(var);
 
 	return itself; //this will return the number itself as a digit
-
 
 }
 
@@ -428,6 +428,16 @@ int main(int argc, char** argv){
 
     }
 
+    printf("----------------INITIAL--------------------\n");
+    printList(head);
+    printf("----------------INTIAL END--------------------\n");
+
+   	//do some stuff here
+
+    printf("----------------FINAL--------------------\n");
+    printList(head);
+
+
     //printf("hello\n");
 
     //printf("numberOfInputs: %d\n", numberOfInputs);
@@ -436,25 +446,25 @@ int main(int argc, char** argv){
     //printf("numberOfOutputs: %d\n", numberOfOutputs);
     //printStringArray(outputNames, numberOfOutputs);
 
-//generating grey code 
-    int g;
-    int n = 1<<numberOfInputs;
-    for(int i = 0; i<n; i++){
-    	g = i ^ (i >> 1);
-	    int* array = getBinaryArray( g, numberOfInputs );
-//printf("--------RUNNING ARITHMATIC-------------\n");
-	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
-//SOULUTION IMPORTANT
-	    for(int i = 0;  i<numberOfInputs; i++){
-	    	printf("%d ", array[i]);
-	    }
-//PRINTS OUTPUT IMPORTANT
-	    for(int i = 0; i<numberOfOutputs; i++){
-	     	printf("%d ", x[i]);
-	    }
-	    printf("\n");
-    	// printf("G: %d\n", g);
-    }
+// //generating grey code 
+//     int g;
+//     int n = 1<<numberOfInputs;
+//     for(int i = 0; i<n; i++){
+//     	g = i ^ (i >> 1);
+// 	    int* array = getBinaryArray( g, numberOfInputs );
+// //printf("--------RUNNING ARITHMATIC-------------\n");
+// 	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
+// //SOULUTION IMPORTANT
+// 	    for(int i = 0;  i<numberOfInputs; i++){
+// 	    	printf("%d ", array[i]);
+// 	    }
+// //PRINTS OUTPUT IMPORTANT
+// 	    for(int i = 0; i<numberOfOutputs; i++){
+// 	     	printf("%d ", x[i]);
+// 	    }
+// 	    printf("\n");
+//     	// printf("G: %d\n", g);
+//     }
 
 
     return 0;
