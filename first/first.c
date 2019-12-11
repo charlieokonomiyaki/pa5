@@ -316,6 +316,11 @@ int main(int argc, char** argv){
 
 	FILE* fp = fopen(argv[1], "r");
 
+	if(fp == NULL){
+		printf("error\n");
+		exit(0);
+	}
+
     struct gate* head = NULL;
     struct gate* current = NULL;
 
@@ -456,7 +461,7 @@ int main(int argc, char** argv){
     	// printf("G: %d\n", g);
     }
 
-
+    fclose(fp);
     return 0;
 
 }

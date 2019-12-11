@@ -36,9 +36,9 @@ struct gate* appendToEnd(struct gate* dnode, struct gate* head){
 	struct gate* ptr = head;
 	struct gate* prev = NULL;
 
-	// if(dnode == head){
-	// 	head = head->next;
-	// }else{
+	if(dnode == head){
+		head = head->next;
+	}else{
 		//delete
 		while(ptr!=dnode){
 			prev = ptr;
@@ -46,7 +46,7 @@ struct gate* appendToEnd(struct gate* dnode, struct gate* head){
 		}
 
 		prev->next = ptr->next;
-	//}
+	}
 	while(ptr != NULL){
 		prev = ptr;
 		ptr = ptr->next;
@@ -386,6 +386,11 @@ int main(int argc, char** argv){
 
 	FILE* fp = fopen(argv[1], "r");
 
+	if(fp == NULL){
+		printf("error\n");
+		exit(0);
+	}
+
     struct gate* head = NULL;
     struct gate* current = NULL;
 
@@ -536,7 +541,11 @@ int main(int argc, char** argv){
     		//printf("Cannot compute\n");
     		ptr = prev;
     	}
-    	prev = ptr;
+    	if(prev == NULL){
+    		prev = head;
+    	} else{
+    		prev = ptr;
+    	}
     	ptr = ptr->next;
     }
 
@@ -574,7 +583,7 @@ int main(int argc, char** argv){
     	// printf("G: %d\n", g);
     }
 
-
+    fclose(fp);
     return 0;
 
 }
