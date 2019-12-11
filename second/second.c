@@ -26,6 +26,39 @@ struct node* insert(struct node* temp, struct node* head);
 int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHead, int numberOfInputs);
 void printNodeList(struct node* head);
 void printIntArray(int* arr, int size);
+int searchTwo(struct gate* ptr, char** orderOfInputs, struct node* outputFront, int numberOfInputs);
+struct gate* appendToEnd(struct gate* dnode, struct gate* head);
+
+struct gate* appendToEnd(struct gate* dnode, struct gate* head){
+
+	//printf("hello------------>from appendToEnd\n");
+
+	struct gate* ptr = head;
+	struct gate* prev = NULL;
+
+	// if(dnode == head){
+	// 	head = head->next;
+	// }else{
+		//delete
+		while(ptr!=dnode){
+			prev = ptr;
+			ptr = ptr->next;
+		}
+
+		prev->next = ptr->next;
+	//}
+	while(ptr != NULL){
+		prev = ptr;
+		ptr = ptr->next;
+	}
+
+	prev->next = dnode;
+	dnode->next = NULL;
+
+	//append to end
+
+	return head;
+}
 
 struct node* insert(struct node* temp, struct node* head){
 	struct node* ptr = head;
@@ -39,6 +72,43 @@ struct node* insert(struct node* temp, struct node* head){
 	}
 	ptr->next = temp;
 	return head;
+}
+
+int searchTwo(struct gate* ptr, char** orderOfInputs, struct node* outputFront, int numberOfInputs){
+	int inputsFound = 0;
+	
+	//printf("Name: %s\n", ptr->name);
+
+	for(int i = 0; i<ptr->gateInputs; i++){
+
+		//printf("inputName: %s\n", ptr->inputs[i]);
+
+		for(int j = 0; j<numberOfInputs; j++){
+			if(strcmp(ptr->inputs[i], orderOfInputs[j]) == 0){
+				inputsFound++;
+			}
+		}
+
+		struct node* outputPtr = outputFront;
+		while(outputPtr != NULL){
+			if(strcmp(ptr->inputs[i], outputPtr->name) == 0){
+				inputsFound++;
+			}
+			outputPtr = outputPtr->next;
+		}
+
+		if(strcmp(ptr->inputs[i], "0") == 0 || strcmp(ptr->inputs[i], "1") == 0){
+			inputsFound++;
+		}
+
+	}
+
+	if(inputsFound == ptr->gateInputs){
+		return 1;
+	}
+
+	return 0;
+
 }
 
 int search(char* var, char** orderOfInputs, int* inputVar, struct node* outputHead, int numberOfInputs){
@@ -349,11 +419,13 @@ int main(int argc, char** argv){
 	    		for(int i = 0; i<2; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
+	    		temp->gateInputs = 1;
 	    	}else if(index > 1 && index < 8){
 	    		current->inputs = malloc(3*sizeof(char*));
 	    		for(int i = 0; i<3; i++){
 	    			current->inputs[i] = malloc(64*sizeof(char));
 	    		}
+	    		temp->gateInputs = 2;
 	    	} else if (index == 9){ //mutliplexer
 	    		//printf("helllo\n");
 
@@ -428,14 +500,48 @@ int main(int argc, char** argv){
 
     }
 
-    printf("----------------INITIAL--------------------\n");
-    printList(head);
-    printf("----------------INTIAL END--------------------\n");
+    // printf("----------------INITIAL--------------------\n");
+    // printList(head);
+    // printf("----------------INTIAL END--------------------\n");
 
    	//do some stuff here
+    struct gate* ptr = head;
 
-    printf("----------------FINAL--------------------\n");
-    printList(head);
+    struct gate* prev = NULL;
+
+    struct node* outputFront = NULL;
+
+    while(ptr != NULL){
+    	if(searchTwo(ptr,orderOfInputs, outputFront,numberOfInputs) == 1){
+    		//printf("found!\n");
+
+    		for(int e = ptr->gateInputs; e<(ptr->amnt); e++){
+    			struct node* tmp = malloc(sizeof(struct node));
+    			tmp->name = malloc(64*sizeof(char));
+
+
+    			tmp->name = ptr->inputs[e];
+
+    			tmp->next = NULL;
+    			tmp->val = 0;
+
+    			outputFront = insert(tmp, outputFront);
+
+    		}
+
+    		//printNodeList(outputFront);
+
+    	} else{
+    		head = appendToEnd(ptr, head);
+    		//printf("Cannot compute\n");
+    		ptr = prev;
+    	}
+    	prev = ptr;
+    	ptr = ptr->next;
+    }
+
+    // printf("----------------FINAL--------------------\n");
+    // printList(head);
 
 
     //printf("hello\n");
@@ -446,25 +552,27 @@ int main(int argc, char** argv){
     //printf("numberOfOutputs: %d\n", numberOfOutputs);
     //printStringArray(outputNames, numberOfOutputs);
 
-// //generating grey code 
-//     int g;
-//     int n = 1<<numberOfInputs;
-//     for(int i = 0; i<n; i++){
-//     	g = i ^ (i >> 1);
-// 	    int* array = getBinaryArray( g, numberOfInputs );
-// //printf("--------RUNNING ARITHMATIC-------------\n");
-// 	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
-// //SOULUTION IMPORTANT
-// 	    for(int i = 0;  i<numberOfInputs; i++){
-// 	    	printf("%d ", array[i]);
-// 	    }
-// //PRINTS OUTPUT IMPORTANT
-// 	    for(int i = 0; i<numberOfOutputs; i++){
-// 	     	printf("%d ", x[i]);
-// 	    }
-// 	    printf("\n");
-//     	// printf("G: %d\n", g);
-//     }
+
+//-------------------------------------------UNCOMMENT ALL OF BOTTOM------------------------------------
+//generating grey code 
+    int g;
+    int n = 1<<numberOfInputs;
+    for(int i = 0; i<n; i++){
+    	g = i ^ (i >> 1);
+	    int* array = getBinaryArray( g, numberOfInputs );
+//printf("--------RUNNING ARITHMATIC-------------\n");
+	    int* x = runArithmetic(array, head, numberOfInputs, orderOfInputs, outputNames, numberOfOutputs);
+//SOULUTION IMPORTANT
+	    for(int i = 0;  i<numberOfInputs; i++){
+	    	printf("%d ", array[i]);
+	    }
+//PRINTS OUTPUT IMPORTANT
+	    for(int i = 0; i<numberOfOutputs; i++){
+	     	printf("%d ", x[i]);
+	    }
+	    printf("\n");
+    	// printf("G: %d\n", g);
+    }
 
 
     return 0;
